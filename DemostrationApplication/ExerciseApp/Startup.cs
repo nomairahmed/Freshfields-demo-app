@@ -1,5 +1,11 @@
+using System;
+using ExerciseApp.Data;
+using ExerciseApp.Service;
+using ExerciseApp.Service.Pricing;
+using ExerciseApp.Service.Rules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,7 +16,7 @@ namespace ExerciseApp
     public class Startup(IConfiguration configuration)
     {
         // This method gets called by the runtime. Use this method to add services to the container.
-        public static void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
                 .AddJsonOptions(option =>
@@ -19,6 +25,16 @@ namespace ExerciseApp
                     option.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 });
             services.AddCors();
+
+            services.AddSingleton(TimeProvider.System);
+            services.AddSingleton<IBasePriceProvider, PriceTable>();
+            services.AddSingleton<IQuoteRule, AgeEligibilityRule>();
+            services.AddSingleton<QuoteService>();
+            services.AddSingleton<VehicleCatalogue>();
+
+            services.AddDbContext<QuoteDbContext>(options =>
+                options.UseSqlite(configuration.GetConnectionString("Quotes")));
+            services.AddScoped<IQuoteRepository, EfQuoteRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -28,6 +44,12 @@ namespace ExerciseApp
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<QuoteDbContext>().Database.Migrate();
+            }
+
             app.UseCors(builder =>
             {
                 builder.WithOrigins("*");

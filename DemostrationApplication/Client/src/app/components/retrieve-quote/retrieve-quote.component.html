@@ -1,0 +1,61 @@
+<div class="row justify-content-center">
+  <div class="col-xl-7">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body p-4">
+        <h1 class="h3 mb-1">Retrieve a quote</h1>
+        <p class="text-body-secondary mb-4">Enter the 8-character reference you were given with your quote.</p>
+
+        <form [formGroup]="lookupForm" (ngSubmit)="find()" novalidate>
+          <label for="reference" class="form-label">Quote reference</label>
+          <div class="input-group has-validation">
+            <input id="reference" type="text" class="form-control text-uppercase" formControlName="reference"
+                   maxlength="12" autocomplete="off" spellcheck="false" placeholder="e.g. 7KX9P2QM"
+                   [class.is-invalid]="showReferenceError"
+                   [attr.aria-invalid]="showReferenceError"
+                   aria-describedby="referenceError">
+            <button type="submit" class="btn btn-primary">Find quote</button>
+            <div id="referenceError" class="invalid-feedback">Enter an 8-character quote reference.</div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div aria-live="polite">
+      <div *ngIf="state === 'loading'" class="d-flex align-items-center gap-2 text-body-secondary">
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        Looking up your quote…
+      </div>
+
+      <div *ngIf="state === 'notFound'" class="alert alert-warning" role="alert" data-testid="not-found">
+        We couldn't find a quote with that reference. Check it and try again, or
+        <a routerLink="/" class="alert-link">get a new quote</a>.
+      </div>
+
+      <div *ngIf="state === 'failed'" class="alert alert-danger" role="alert">
+        Sorry, we couldn't look up your quote. Please try again.
+      </div>
+
+      <div *ngIf="state === 'found' && quote" class="card shadow-sm" data-testid="saved-quote">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="h5 mb-0">Quote {{ quote.reference }}</h2>
+          <span class="fs-4 fw-semibold">{{ quote.premium | currency:'GBP' }}</span>
+        </div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-lg-5">Quoted on</dt>
+            <dd class="col-lg-7">{{ quote.createdUtc | date:'d MMMM y, HH:mm' }}</dd>
+
+            <dt class="col-lg-5">Type of insurance</dt>
+            <dd class="col-lg-7">{{ quote.insuranceTypeDescription }}</dd>
+
+            <dt class="col-lg-5">Car</dt>
+            <dd class="col-lg-7">{{ quote.make }} {{ quote.model }}</dd>
+
+            <dt class="col-lg-5">Date of birth</dt>
+            <dd class="col-lg-7 mb-0">{{ quote.dateOfBirth | date:'d MMMM y' }}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

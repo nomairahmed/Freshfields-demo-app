@@ -1,0 +1,20 @@
+<header>
+  <nav class="navbar navbar-expand bg-primary" data-bs-theme="dark" aria-label="Main">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" routerLink="/">Car Insurance Quotes</a>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+             ariaCurrentWhenActive="page">Get a quote</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/quotes" routerLinkActive="active" ariaCurrentWhenActive="page">Retrieve a quote</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="container py-4">
+  <router-outlet></router-outlet>
+</main>

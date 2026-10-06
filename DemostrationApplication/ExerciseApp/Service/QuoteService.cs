@@ -1,70 +1,23 @@
+using System.Collections.Generic;
 using ExerciseApp.Model;
+using ExerciseApp.Service.Pricing;
+using ExerciseApp.Service.Rules;
 
 namespace ExerciseApp.Service
 {
-    public class QuoteService
+    public class QuoteService(IBasePriceProvider prices, IEnumerable<IQuoteRule> rules)
     {
-        public QuoteDetail GetQuoteDetail()
+        public QuoteResult PerformQuote(QuoteRequest request)
         {
-            var quoteDetail = new QuoteDetail();
-
-            quoteDetail.Makes.Add("Ford");
-            quoteDetail.Makes.Add("Audi");
-            quoteDetail.Makes.Add("BMW");
-
-            var modelSpec = new ModelSpec { Make = "Ford" };
-            modelSpec.Models.AddRange(new []{ "Fiesta", "Focus", "Puma", "S Max" });
-            quoteDetail.Models.Add(modelSpec);
-
-            modelSpec = new ModelSpec { Make = "Audi" };
-            modelSpec.Models.AddRange(new[] { "A3", "A4", "A5" });
-            quoteDetail.Models.Add(modelSpec);
-
-            modelSpec = new ModelSpec { Make = "BMS" };
-            modelSpec.Models.AddRange(new[] { "X5", "3 Series", "5 Series" });
-            quoteDetail.Models.Add(modelSpec);
-
-            return quoteDetail;
-        }
-
-        public decimal PerformQuote(QuoteRequest request)
-        {
-            if (request.InsuranceType == InsuranceType.FullyComprehensive)
+            foreach (var rule in rules)
             {
-                if (request.Make == "Ford")
-                    return 200;
-                if (request.Make == "BMW")
-                {
-                    if (request.Model == "X5")
-                        return 500;
-                    else
-                        return 400;
-                }
-                return 300;
+                var reason = rule.GetDeclineReason(request);
+                if (reason is not null)
+                    return QuoteResult.Declined(reason);
             }
-            if (request.InsuranceType == InsuranceType.ThirdPartyFireAndTheft) {
-                if (request.Make == "Ford")
-                    return 180;
-                if (request.Make == "BMW")
-                {
-                    if (request.Model == "X5")
-                        return 510;
-                    else
-                        return 400;
-                }
-                return 300;
-            }
-            if (request.InsuranceType == InsuranceType.ThirdPartyOnly)
-            {
-                if (request.Make == "Ford")
-                    return 180;
-                if (request.Make == "Audi")
-                {
-                    return 250;
-                }
-                return 300;
-            }
-            return 0;
+
+            return QuoteResult.Accepted(
+                prices.GetBasePrice(request.InsuranceType.Value, request.Make, request.Model));
         }
     }
 }

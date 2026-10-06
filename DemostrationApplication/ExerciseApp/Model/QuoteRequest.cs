@@ -18,6 +18,7 @@ namespace ExerciseApp.Model
         public string Model { get; set; }
 
         [Required]
+        [EnumDataType(typeof(InsuranceType))]
         public InsuranceType? InsuranceType { get; set; }
     }
 }

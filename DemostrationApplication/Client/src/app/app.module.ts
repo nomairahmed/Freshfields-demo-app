@@ -1,27 +1,32 @@
-import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { registerLocaleData } from '@angular/common';
+import { provideHttpClient } from '@angular/common/http';
+import localeEnGb from '@angular/common/locales/en-GB';
+import { LOCALE_ID, NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { UnsureComponent } from './components/unsure/unsure.component';
-import { UnsureService } from './service/unsure.service';
+import { QuoteFormComponent } from './components/quote-form/quote-form.component';
+import { RetrieveQuoteComponent } from './components/retrieve-quote/retrieve-quote.component';
+
+registerLocaleData(localeEnGb);
 
 @NgModule({
   declarations: [
-    UnsureComponent
+    AppComponent,
+    QuoteFormComponent,
+    RetrieveQuoteComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
-    CommonModule,
-    FormsModule,
-     ReactiveFormsModule
-
+    ReactiveFormsModule
   ],
-  providers: [UnsureService],
-  bootstrap:[UnsureComponent]
+  providers: [
+    provideHttpClient(),
+    { provide: LOCALE_ID, useValue: 'en-GB' }
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

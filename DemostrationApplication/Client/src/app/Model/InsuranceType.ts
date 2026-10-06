@@ -1,4 +1,5 @@
 export enum InsuranceType {
-    itFullyComprehensive, itThirdPartyFireAndTheft, itThirdPartyOnly
+    FullyComprehensive = 'FullyComprehensive',
+    ThirdPartyFireAndTheft = 'ThirdPartyFireAndTheft',
+    ThirdPartyOnly = 'ThirdPartyOnly'
 }
-;
